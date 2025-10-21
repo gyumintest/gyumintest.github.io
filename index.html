@@ -1,701 +1,360 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎯 줄임말 테스트</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.5/dist/chart.umd.js"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-            overscroll-behavior: none;
-        }
-        .container {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            width: 90vw;
-            max-width: 450px;
-            transition: transform 0.3s ease;
-        }
-        .container:hover {
-            transform: translateY(-4px);
-        }
-        h2, h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-weight: 700;
-            font-size: 18px;
-        }
-        input {
-            margin: 8px;
-            padding: 10px;
-            width: 85%;
-            max-width: 200px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        input:focus {
-            border-color: #1e90ff;
-            box-shadow: 0 0 5px rgba(30, 144, 255, 0.3);
-            outline: none;
-        }
-        button {
-            padding: 10px 20px;
-            background: linear-gradient(45deg, #1e90ff, #00b4db);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.3s ease, transform 0.2s ease;
-            min-width: 100px;
-            touch-action: manipulation;
-        }
-        button:hover {
-            background: linear-gradient(45deg, #1c86ee, #00a8cc);
-            transform: translateY(-2px);
-        }
-        .radio-group {
-            margin: 15px 0;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .radio-group label {
-            font-size: 14px;
-            color: #34495e;
-            font-weight: 500;
-        }
-        #loginSection, #testSection, #resultSection, #graphSection, #addQuestionSection {
-            display: none;
-        }
-        #question {
-            font-size: 15px;
-            color: #2c3e50;
-            margin: 15px 0;
-            font-weight: 500;
-            word-break: break-word;
-            overflow-wrap: break-word;
-        }
-        canvas {
-            margin-top: 15px;
-            max-width: 100%;
-            border-radius: 10px;
-            background: #fff;
-            padding: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-        .no-data {
-            font-size: 15px;
-            color: #7f8c8d;
-            margin: 15px 0;
-            font-style: italic;
-        }
-        .table-container {
-            max-width: 100%;
-            overflow-x: auto;
-            margin-top: 15px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            text-align: center;
-        }
-        th, td {
-            border: 1px solid #dfe6e9;
-            padding: 8px;
-            min-width: 70px;
-        }
-        th {
-            background-color: #ecf0f1;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        td {
-            color: #34495e;
-        }
-        .response-yes {
-            color: #2ecc71;
-            font-weight: 500;
-        }
-        .response-no {
-            color: #e74c3c;
-            font-weight: 500;
-        }
-        .response-na {
-            color: #95a5a6;
-            font-style: italic;
-        }
-        @media (max-width: 400px) {
-            h2, h3 { font-size: 16px; }
-            input, button { font-size: 13px; padding: 8px 15px; }
-            .radio-group label { font-size: 13px; }
-            #question { font-size: 14px; }
-            .container { padding: 15px; }
-            button { min-width: 90px; }
-            table { font-size: 12px; }
-            th, td { padding: 6px; min-width: 60px; }
-        }
-        @media (max-width: 320px) {
-            input { max-width: 160px; }
-            button { min-width: 80px; font-size: 12px; }
-            table { font-size: 11px; }
-            th, td { min-width: 50px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>줄임말 테스트</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        background: linear-gradient(135deg, #e0eafc, #cfdef3);
+        overscroll-behavior: none;
+    }
+    .container {
+        background-color: #ffffff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        width: 90vw;
+        max-width: 400px;
+        transition: transform 0.3s ease;
+    }
+    .container:hover { transform: translateY(-2px); }
+    h2, h3 { color: #333; margin-bottom: 12px; font-weight: 600; font-size: 16px; }
+    input { margin: 6px; padding: 8px; width: 85%; max-width: 180px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; transition: border-color 0.3s ease; }
+    input:focus { border-color: #4CAF50; outline: none; }
+    button {
+        padding: 8px 16px;
+        background: linear-gradient(45deg, #4CAF50, #66BB6A);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        transition: background 0.3s ease;
+        min-width: 90px;
+        touch-action: manipulation;
+    }
+    button:hover { background: linear-gradient(45deg, #45a049, #5cb85c); }
+    .radio-group { margin: 12px 0; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .radio-group label { font-size: 13px; color: #555; }
+    #loginSection, #testSection, #resultSection, #graphSection, #addQuestionSection { display: none; }
+    #question { font-size: 14px; color: #333; margin: 12px 0; font-weight: 500; word-break: break-word; overflow-wrap: break-word; }
+    canvas { margin-top: 12px; max-width: 100%; border-radius: 6px; background: #fff; padding: 6px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+    .no-data { font-size: 14px; color: #555; margin: 12px 0; }
+    .table-container { max-width: 100%; overflow-x: auto; margin-top: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; }
+    th, td { border: 1px solid #ddd; padding: 6px; min-width: 60px; }
+    th { background-color: #f5f5f5; font-weight: 600; color: #333; }
+    td { color: #555; }
+    @media (max-width: 400px) {
+        h2, h3 { font-size: 14px; }
+        input, button { font-size: 12px; padding: 6px 12px; }
+        .radio-group label { font-size: 12px; }
+        #question { font-size: 13px; }
+        .container { padding: 12px; }
+        button { min-width: 80px; }
+        table { font-size: 11px; }
+        th, td { padding: 4px; min-width: 50px; }
+    }
+    @media (max-width: 320px) {
+        input { max-width: 150px; }
+        button { min-width: 70px; font-size: 11px; }
+        table { font-size: 10px; }
+        th, td { min-width: 40px; }
+    }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h2>🎯 줄임말 테스트</h2>
-        <div id="loginSection">
-            <h3>👤 규민 로그인</h3>
-            <div>
-                <label for="adminId">아이디:</label>
-                <input type="text" id="adminId" placeholder="아이디 입력">
-            </div>
-            <div>
-                <label for="adminPassword">비밀번호:</label>
-                <input type="password" id="adminPassword" placeholder="비밀번호 입력">
-            </div>
-            <button onclick="adminLogin()">🔑 로그인</button>
+<div class="container">
+    <h2>🎯 줄임말 테스트</h2>
+
+    <div id="loginSection">
+        <h3>👤 규민 로그인</h3>
+        <div>
+            <label for="adminId">아이디:</label>
+            <input type="text" id="adminId" placeholder="아이디 입력">
         </div>
-        <form id="infoForm" onsubmit="startTest(event)">
-            <h3>📝 학생 정보 입력</h3>
-            <div>
-                <label for="name">이름:</label>
-                <input type="text" id="name" placeholder="이름을 입력하세요" required>
-            </div>
-            <div>
-                <button type="submit">▶ 테스트 시작</button>
-                <button type="button" onclick="showAdminLogin()">👤 규민 로그인</button>
-            </div>
-        </form>
-        <div id="testSection">
-            <h3>📚 줄임말 테스트</h3>
-            <p id="question"></p>
-            <div class="radio-group">
-                <label>✅ <input type="radio" name="answer" value="yes"> 씁니다</label>
-                <label>❌ <input type="radio" name="answer" value="no"> 안씁니다</label>
-            </div>
-            <button onclick="nextQuestion()">➡ 다음</button>
-            <button onclick="goBack('testSection')">🔙 뒤로 가기</button>
+        <div>
+            <label for="adminPassword">비밀번호:</label>
+            <input type="password" id="adminPassword" placeholder="비밀번호 입력">
         </div>
-        <div id="resultSection">
-            <h3>🏆 테스트 결과</h3>
-            <p id="result"></p>
-            <canvas id="personalScoreChart"></canvas>
-            <button onclick="restartTest()">🔄 다시 시작</button>
-            <button onclick="goBack('resultSection')">🔙 뒤로 가기</button>
-        </div>
-        <div id="addQuestionSection">
-            <h3>➕ 질문 추가</h3>
-            <div>
-                <label for="newQuestion">새 줄임말:</label>
-                <input type="text" id="newQuestion" placeholder="줄임말 입력">
-            </div>
-            <button onclick="addQuestion()">✅ 질문 추가</button>
-            <button onclick="showGraph()">📊 그래프 보기</button>
-            <button onclick="showTable()">🗂 학생 응답 보기</button>
-            <button onclick="resetStudentData()">🧹 학생 데이터 초기화</button>
-            <button onclick="goBack('addQuestionSection')">🔙 뒤로 가기</button>
-            <button onclick="restartTest()">🔄 다시 시작</button>
-            <div id="responseTable" class="table-container"></div>
-        </div>
-        <div id="graphSection">
-            <h3>📈 전체 학생 점수</h3>
-            <div id="noDataMessage" class="no-data" style="display: none;">학생 데이터가 없습니다.</div>
-            <canvas id="scoreChart" style="display: none;"></canvas>
-            <button onclick="restartTest()">🔄 다시 시작</button>
-            <button onclick="goBack('graphSection')">🔙 뒤로 가기</button>
-        </div>
+        <button onclick="adminLogin()">🔑 로그인</button>
     </div>
 
-    <script>
-        let questions = [];
-        let studentData = [];
-        let currentQuestion = 0;
-        let score = 0;
-        let currentStudent = {};
-        let currentResponses = [];
-        let chartInstance = null;
-        let personalChartInstance = null;
+    <form id="infoForm" onsubmit="startTest(event)">
+        <h3>📝 학생 정보 입력</h3>
+        <div>
+            <label for="name">이름:</label>
+            <input type="text" id="name" placeholder="이름을 입력하세요" required>
+        </div>
+        <div>
+            <button type="submit">▶ 테스트 시작</button>
+            <button type="button" onclick="showAdminLogin()">👤 규민 로그인</button>
+        </div>
+    </form>
 
-        // 데이터 초기화 및 오류 처리
-        try {
-            questions = JSON.parse(localStorage.getItem('questions')) || [
-                { text: "생파", correct: "no" },
-                { text: "생선", correct: "no" },
-                { text: "영통", correct: "no" },
-                { text: "카톡", correct: "no" },
-                { text: "ㅇㅇ", correct: "no" },
-                { text: "ㅇㅈ", correct: "no" },
-                { text: "ㅇㅋ", correct: "no" }
-            ];
-            studentData = JSON.parse(localStorage.getItem('studentData')) || [];
-        } catch (e) {
-            console.error('🛑 데이터 초기화 오류:', e);
-            questions = [
-                { text: "생파", correct: "no" },
-                { text: "생선", correct: "no" },
-                { text: "영통", correct: "no" },
-                { text: "카톡", correct: "no" },
-                { text: "ㅇㅇ", correct: "no" },
-                { text: "ㅇㅈ", correct: "no" },
-                { text: "ㅇㅋ", correct: "no" }
-            ];
-            studentData = [];
-            localStorage.setItem('questions', JSON.stringify(questions));
-            localStorage.removeItem('studentData');
-            console.warn('🔄 localStorage 오류로 데이터 초기화');
-        }
+    <div id="testSection">
+        <h3>📚 줄임말 테스트</h3>
+        <p id="question"></p>
+        <div class="radio-group">
+            <label>✅ <input type="radio" name="answer" value="yes"> 씁니다</label>
+            <label>❌ <input type="radio" name="answer" value="no"> 안씁니다</label>
+        </div>
+        <button onclick="nextQuestion()">➡ 다음</button>
+        <button onclick="goBack('testSection')">🔙 뒤로 가기</button>
+    </div>
 
-        window.onload = () => {
-            console.log('📄 페이지 로드, studentData:', JSON.stringify(studentData), 'questions:', JSON.stringify(questions));
-            document.getElementById('infoForm').style.display = 'block';
-        };
+    <div id="resultSection">
+        <h3>🏆 테스트 결과</h3>
+        <p id="result"></p>
+        <canvas id="personalScoreChart"></canvas>
+        <!-- 다시 시작 버튼 제거 -->
+        <button onclick="goBack('resultSection')">🔙 뒤로 가기</button>
+    </div>
 
-        function showAdminLogin() {
-            document.getElementById('infoForm').style.display = 'none';
-            document.getElementById('loginSection').style.display = 'block';
-            console.log('👤 규민 로그인 화면 표시');
-        }
+    <div id="addQuestionSection">
+        <h3>➕ 질문 추가</h3>
+        <div>
+            <label for="newQuestion">새 줄임말:</label>
+            <input type="text" id="newQuestion" placeholder="줄임말 입력">
+        </div>
+        <button onclick="addQuestion()">✅ 질문 추가</button>
+        <button onclick="showGraph()">📊 그래프 보기</button>
+        <button onclick="showTable()">🗂 학생 응답 보기</button>
+        <button onclick="resetStudentData()">🧹 학생 데이터 초기화</button>
+        <button onclick="goBack('addQuestionSection')">🔙 뒤로 가기</button>
+        <div id="responseTable" class="table-container"></div>
+    </div>
 
-        function adminLogin() {
-            const id = document.getElementById('adminId').value.trim();
-            const password = document.getElementById('adminPassword').value.trim();
-            if (id === "2541" && password === "2541") {
-                document.getElementById('loginSection').style.display = 'none';
-                document.getElementById('addQuestionSection').style.display = 'block';
-                showTable();
-                console.log('🔑 규민 로그인 성공, addQuestionSection 표시');
-            } else {
-                alert('🚫 아이디 또는 비밀번호가 잘못되었습니다.');
-                console.warn('🚫 규민 로그인 실패: 잘못된 자격 증명');
-            }
-        }
+    <div id="graphSection">
+        <h3>📈 전체 학생 점수</h3>
+        <div id="noDataMessage" class="no-data" style="display: none;">학생 데이터가 없습니다.</div>
+        <canvas id="scoreChart" style="display: none;"></canvas>
+        <button onclick="restartTest()">🔄 다시 시작</button>
+        <button onclick="goBack('graphSection')">🔙 뒤로 가기</button>
+    </div>
+</div>
 
-        function goBack(currentSection) {
-            document.getElementById(currentSection).style.display = 'none';
-            if (currentSection === 'testSection') {
-                document.getElementById('infoForm').style.display = 'block';
-                document.getElementById('infoForm').reset();
-                console.log('🔙 testSection에서 infoForm으로 이동');
-            } else if (currentSection === 'resultSection') {
-                document.getElementById('infoForm').style.display = 'block';
-                document.getElementById('infoForm').reset();
-                if (personalChartInstance) {
-                    personalChartInstance.destroy();
-                    personalChartInstance = null;
-                    console.log('📊 개인 차트 소멸');
-                }
-                console.log('🔙 resultSection에서 infoForm으로 이동');
-            } else if (currentSection === 'addQuestionSection') {
-                document.getElementById('loginSection').style.display = 'block';
-                document.getElementById('adminId').value = '';
-                document.getElementById('adminPassword').value = '';
-                console.log('🔙 addQuestionSection에서 loginSection으로 이동');
-            } else if (currentSection === 'graphSection') {
-                document.getElementById('addQuestionSection').style.display = 'block';
-                showTable();
-                console.log('🔙 graphSection에서 addQuestionSection으로 이동, 표 갱신');
-            }
-        }
+<script>
+let questions = JSON.parse(localStorage.getItem('questions')) || [
+    { text: "생파", correct: "no" },
+    { text: "생선", correct: "no" },
+    { text: "영통", correct: "no" },
+    { text: "카톡", correct: "no" },
+    { text: "ㅇㅇ", correct: "no" },
+    { text: "ㅇㅈ", correct: "no" },
+    { text: "ㅇㅋ", correct: "no" }
+];
+let currentQuestion = 0;
+let score = 0;
+let studentData = JSON.parse(localStorage.getItem('studentData')) || [];
+let currentStudent = {};
+let currentResponses = [];
+let chartInstance = null;
+let personalChartInstance = null;
 
-        function startTest(event) {
-            event.preventDefault();
-            const nameInput = document.getElementById('name').value.trim();
-            if (!nameInput) {
-                alert('⚠️ 이름을 입력해주세요!');
-                console.warn('⚠️ 테스트 시작 실패: 이름 미입력');
-                return;
-            }
-            currentStudent = { name: nameInput };
-            currentResponses = [];
-            document.getElementById('infoForm').style.display = 'none';
-            document.getElementById('testSection').style.display = 'block';
-            currentQuestion = 0;
-            score = 0;
-            console.log('▶ 테스트 시작, 학생:', nameInput, '질문 수:', questions.length);
-            loadQuestion();
-        }
+window.onload = () => { document.getElementById('infoForm').style.display = 'block'; };
 
-        function loadQuestion() {
-            if (currentQuestion < questions.length && questions[currentQuestion]) {
-                const questionText = questions[currentQuestion].text || "알 수 없음";
-                document.getElementById('question').textContent = `문제 ${currentQuestion + 1}: "${questionText}"을(를) 사용합니까?`;
-                document.querySelectorAll('input[name="answer"]').forEach(radio => radio.checked = false);
-                console.log('📝 질문 로드:', currentQuestion + 1, questionText);
-            } else {
-                showResult();
-            }
-        }
+function showAdminLogin() {
+    document.getElementById('infoForm').style.display = 'none';
+    document.getElementById('loginSection').style.display = 'block';
+}
 
-        function nextQuestion() {
-            const selected = document.querySelector('input[name="answer"]:checked');
-            if (!selected) {
-                alert('⚠️ 답을 선택해주세요!');
-                console.warn('⚠️ 다음 질문 차단: 답변 미선택');
-                return;
-            }
-            currentResponses.push(selected.value);
-            console.log('📋 질문', currentQuestion + 1, '응답:', selected.value, 'currentResponses:', JSON.stringify(currentResponses));
-            if (selected.value === questions[currentQuestion].correct) {
-                score++;
-            }
-            currentQuestion++;
-            loadQuestion();
-        }
+function adminLogin() {
+    const id = document.getElementById('adminId').value;
+    const password = document.getElementById('adminPassword').value;
+    if (id === "2541" && password === "2541") {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('addQuestionSection').style.display = 'block';
+        showTable();
+    } else alert('아이디 또는 비밀번호가 잘못되었습니다.');
+}
 
-        function showResult() {
-            document.getElementById('testSection').style.display = 'none';
-            document.getElementById('resultSection').style.display = 'block';
-            const percentage = Math.round((score / questions.length) * 100);
-            document.getElementById('result').textContent = `🏆 ${currentStudent.name}님의 점수: ${score}/${questions.length} (${percentage}점)`;
-            const studentRecord = {
-                label: currentStudent.name,
-                score: percentage,
-                responses: [...currentResponses]
-            };
-            studentData.push(studentRecord);
-            try {
-                localStorage.setItem('studentData', JSON.stringify(studentData));
-                console.log('💾 결과 저장:', JSON.stringify(studentRecord), 'studentData:', JSON.stringify(studentData));
-            } catch (e) {
-                console.error('🛑 studentData 저장 오류:', e);
-                alert('⚠️ 데이터 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
-            }
+function goBack(currentSection) {
+    document.getElementById(currentSection).style.display = 'none';
+    if (currentSection === 'testSection') {
+        document.getElementById('infoForm').style.display = 'block';
+        document.getElementById('infoForm').reset();
+    } else if (currentSection === 'resultSection') {
+        document.getElementById('testSection').style.display = 'block';
+        currentQuestion = questions.length - 1;
+        loadQuestion();
+        if (personalChartInstance) { personalChartInstance.destroy(); personalChartInstance=null; }
+    } else if (currentSection === 'addQuestionSection') {
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('adminId').value = '';
+        document.getElementById('adminPassword').value = '';
+    } else if (currentSection === 'graphSection') {
+        document.getElementById('addQuestionSection').style.display = 'block';
+        showTable();
+    }
+}
 
-            if (personalChartInstance) {
-                personalChartInstance.destroy();
-                personalChartInstance = null;
-                console.log('📊 개인 차트 소멸');
-            }
-            const ctx = document.getElementById('personalScoreChart').getContext('2d');
-            personalChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: [currentStudent.name],
-                    datasets: [{
-                        label: '내 점수 (1-100)',
-                        data: [percentage],
-                        backgroundColor: 'rgba(46, 204, 113, 0.7)',
-                        borderColor: 'rgba(46, 204, 113, 1)',
-                        borderWidth: 2,
-                        borderRadius: 6,
-                        borderSkipped: false,
-                        barThickness: 'flex',
-                        maxBarThickness: 16
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: {
-                        duration: 1000,
-                        easing: 'easeOutQuart'
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
-                            ticks: { color: '#2c3e50', font: { size: 12 }, stepSize: 20 },
-                            title: {
-                                display: true,
-                                text: '점수 (1-100)',
-                                color: '#2c3e50',
-                                font: { size: 14, weight: 'bold' }
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#2c3e50', font: { size: 12 } },
-                            title: {
-                                display: true,
-                                text: '학생',
-                                color: '#2c3e50',
-                                font: { size: 14, weight: 'bold' }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        title: {
-                            display: true,
-                            text: '내 줄임말 비사용 점수',
-                            color: '#2c3e50',
-                            font: { size: 16, weight: 'bold' },
-                            padding: 10
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleFont: { size: 12 },
-                            bodyFont: { size: 10 },
-                            padding: 6,
-                            cornerRadius: 6
-                        }
-                    }
-                }
-            });
-            console.log('📊 개인 차트 렌더링:', currentStudent.name, '점수:', percentage);
-        }
+function startTest(event) {
+    event.preventDefault();
+    const nameInput = document.getElementById('name').value.trim();
+    if (!nameInput) { alert('이름을 입력해주세요!'); return; }
+    currentStudent = { name: nameInput };
+    currentResponses = [];
+    document.getElementById('infoForm').style.display = 'none';
+    document.getElementById('testSection').style.display = 'block';
+    currentQuestion = 0; score = 0;
+    loadQuestion();
+}
 
-        function addQuestion() {
-            const newQuestionText = document.getElementById('newQuestion').value.trim();
-            if (!newQuestionText) {
-                alert('⚠️ 줄임말을 입력해주세요!');
-                console.warn('⚠️ 질문 추가 실패: 줄임말 미입력');
-                return;
-            }
-            questions.push({ text: newQuestionText, correct: 'no' });
-            try {
-                localStorage.setItem('questions', JSON.stringify(questions));
-                console.log('➕ 질문 추가:', newQuestionText, 'questions:', JSON.stringify(questions));
-            } catch (e) {
-                console.error('🛑 질문 저장 오류:', e);
-                alert('⚠️ 질문 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
-            }
-            document.getElementById('newQuestion').value = '';
-            alert('✅ 질문이 추가되었습니다!');
-            showTable();
-        }
+function loadQuestion() {
+    if (currentQuestion < questions.length && questions[currentQuestion]) {
+        document.getElementById('question').textContent = `문제 ${currentQuestion + 1}: "${questions[currentQuestion].text}"을(를) 사용합니까?`;
+        document.querySelectorAll('input[name="answer"]').forEach(radio => radio.checked=false);
+    } else showResult();
+}
 
-        function resetStudentData() {
-            if (!confirm('🗑 모든 학생 데이터를 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-                console.log('🔄 학생 데이터 초기화 취소');
-                return;
-            }
-            studentData = [];
-            try {
-                localStorage.removeItem('studentData');
-                console.log('🧹 학생 데이터 초기화, studentData:', JSON.stringify(studentData));
-            } catch (e) {
-                console.error('🛑 studentData 초기화 오류:', e);
-                alert('⚠️ 데이터 초기화 중 오류가 발생했습니다. 다시 시도해주세요.');
-            }
-            if (chartInstance) {
-                chartInstance.destroy();
-                chartInstance = null;
-                console.log('📊 전체 차트 소멸');
-            }
-            document.getElementById('responseTable').innerHTML = '<p class="no-data">학생 데이터가 없습니다.</p>';
-            alert('🧹 학생 데이터가 초기화되었습니다.');
-        }
+function nextQuestion() {
+    const selected = document.querySelector('input[name="answer"]:checked');
+    if (!selected) { alert('답을 선택해주세요!'); return; }
+    currentResponses.push(selected.value);
+    if (selected.value === questions[currentQuestion].correct) score++;
+    currentQuestion++; loadQuestion();
+}
 
-        function showTable() {
-            console.log('🗂 showTable 호출, studentData:', JSON.stringify(studentData), 'questions:', JSON.stringify(questions));
-            const tableContainer = document.getElementById('responseTable');
-            tableContainer.innerHTML = '';
-            if (studentData.length === 0) {
-                tableContainer.innerHTML = '<p class="no-data">학생 데이터가 없습니다.</p>';
-                console.log('🚫 학생 데이터 없음');
-                return;
-            }
+function showResult() {
+    document.getElementById('testSection').style.display='none';
+    document.getElementById('resultSection').style.display='block';
 
-            let table = '<table><thead><tr><th>학생</th>';
-            questions.forEach((q, index) => {
-                table += `<th>문제 ${index + 1}<br>("${q.text}")</th>`;
-            });
-            table += '</tr></thead><tbody>';
+    const percentage = Math.round((score/questions.length)*100);
+    document.getElementById('result').textContent = `🎉 ${currentStudent.name}님의 점수: ${score}/${questions.length} (${percentage}점)`;
 
-            studentData.forEach(student => {
-                if (!student.responses) {
-                    console.warn('⚠️ 응답 없음, 학생:', student.label);
-                    student.responses = [];
-                }
-                console.log('📋 학생 렌더링:', student.label, '응답:', JSON.stringify(student.responses));
-                table += `<tr><td>${student.label}</td>`;
-                for (let i = 0; i < questions.length; i++) {
-                    const response = student.responses[i] || 'N/A';
-                    const className = response === 'yes' ? 'response-yes' : response === 'no' ? 'response-no' : 'response-na';
-                    table += `<td class="${className}">${response === 'yes' ? '✅ 씁니다' : response === 'no' ? '❌ 안씁니다' : 'N/A'}</td>`;
-                }
-                table += '</tr>';
-            });
-            table += '</tbody></table>';
-            tableContainer.innerHTML = table;
-            console.log('🗂 표 렌더링 완료, HTML:', tableContainer.innerHTML);
-        }
+    // 학생 데이터 저장
+    studentData.push({ label: currentStudent.name, score: percentage, responses: currentResponses });
+    localStorage.setItem('studentData', JSON.stringify(studentData));
 
-        function showGraph() {
-            document.getElementById('resultSection').style.display = 'none';
-            document.getElementById('infoForm').style.display = 'none';
-            document.getElementById('testSection').style.display = 'none';
-            document.getElementById('addQuestionSection').style.display = 'none';
-            document.getElementById('graphSection').style.display = 'block';
+    // 개인 점수 차트
+    if(personalChartInstance) personalChartInstance.destroy();
+    const ctx = document.getElementById('personalScoreChart').getContext('2d');
+    personalChartInstance = new Chart(ctx, {
+        type:'bar',
+        data:{
+            labels:[currentStudent.name],
+            datasets:[{
+                label:'내 점수 (1-100)',
+                data:[percentage],
+                backgroundColor:'rgba(75,192,192,0.7)',
+                borderColor:'rgba(75,192,192,1)',
+                borderWidth:2, borderRadius:6
+            }]
+        },
+        options:{ responsive:true, scales:{ y:{ beginAtZero:true, max:100 } } }
+    });
 
-            const noDataMessage = document.getElementById('noDataMessage');
-            const scoreChart = document.getElementById('scoreChart');
+    // 다시 시작 버튼 제거
+    const restartBtn = document.querySelector('#resultSection button[onclick="restartTest()"]');
+    if (restartBtn) restartBtn.style.display = 'none';
+}
 
-            if (studentData.length === 0) {
-                noDataMessage.style.display = 'block';
-                scoreChart.style.display = 'none';
-                console.log('🚫 그래프용 학생 데이터 없음');
-                return;
-            } else {
-                noDataMessage.style.display = 'none';
-                scoreChart.style.display = 'block';
-            }
+function addQuestion() {
+    const newQuestionText = document.getElementById('newQuestion').value.trim();
+    if (!newQuestionText) { alert('줄임말을 입력해주세요!'); return; }
+    questions.push({ text:newQuestionText, correct:'no' });
+    localStorage.setItem('questions', JSON.stringify(questions));
+    document.getElementById('newQuestion').value='';
+    alert('✅ 질문이 추가되었습니다!');
+}
 
-            if (chartInstance) {
-                chartInstance.destroy();
-                console.log('📊 전체 차트 소멸');
-            }
+function resetStudentData() {
+    if(!confirm('모든 학생 데이터를 초기화하시겠습니까?')) return;
+    studentData=[]; localStorage.removeItem('studentData');
+    if(chartInstance){ chartInstance.destroy(); chartInstance=null; }
+    document.getElementById('responseTable').innerHTML='';
+    alert('🧹 학생 데이터가 초기화되었습니다.');
+    document.getElementById('addQuestionSection').style.display='block';
+    document.getElementById('graphSection').style.display='none';
+}
 
-            const ctx = scoreChart.getContext('2d');
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: studentData.map(d => d.label),
-                    datasets: [{
-                        label: '줄임말 비사용 점수 (1-100)',
-                        data: studentData.map(d => d.score || 0),
-                        backgroundColor: studentData.map((_, i) => [
-                            'rgba(46, 204, 113, 0.7)',
-                            'rgba(52, 152, 219, 0.7)',
-                            'rgba(241, 196, 15, 0.7)',
-                            'rgba(231, 76, 60, 0.7)',
-                            'rgba(155, 89, 182, 0.7)'
-                        ][i % 5]),
-                        borderColor: studentData.map((_, i) => [
-                            'rgba(46, 204, 113, 1)',
-                            'rgba(52, 152, 219, 1)',
-                            'rgba(241, 196, 15, 1)',
-                            'rgba(231, 76, 60, 1)',
-                            'rgba(155, 89, 182, 1)'
-                        ][i % 5]),
-                        borderWidth: 2,
-                        borderRadius: 6,
-                        borderSkipped: false,
-                        barThickness: 'flex',
-                        maxBarThickness: 16
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: {
-                        duration: 1000,
-                        easing: 'easeOutQuart'
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
-                            ticks: { color: '#2c3e50', font: { size: 12 }, stepSize: 20 },
-                            title: {
-                                display: true,
-                                text: '점수 (1-100)',
-                                color: '#2c3e50',
-                                font: { size: 14, weight: 'bold' }
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#2c3e50', font: { size: 12 }, maxRotation: 45, minRotation: 45 },
-                            title: {
-                                display: true,
-                                text: '학생',
-                                color: '#2c3e50',
-                                font: { size: 14, weight: 'bold' }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        title: {
-                            display: true,
-                            text: '전체 학생의 줄임말 비사용 점수',
-                            color: '#2c3e50',
-                            font: { size: 16, weight: 'bold' },
-                            padding: 10
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleFont: { size: 12 },
-                            bodyFont: { size: 10 },
-                            padding: 6,
-                            cornerRadius: 6
-                        }
-                    }
-                }
-            });
-            console.log('📈 그래프 렌더링, 학생:', studentData.map(d => d.label));
-        }
+function showTable() {
+    const tableContainer = document.getElementById('responseTable');
+    if(studentData.length===0){ tableContainer.innerHTML='<p class="no-data">학생 데이터가 없습니다.</p>'; return; }
 
-        function restartTest() {
-            currentQuestion = 0;
-            score = 0;
-            currentStudent = {};
-            currentResponses = [];
-            document.getElementById('testSection').style.display = 'none';
-            document.getElementById('resultSection').style.display = 'none';
-            document.getElementById('graphSection').style.display = 'none';
-            document.getElementById('addQuestionSection').style.display = 'none';
-            document.getElementById('infoForm').style.display = 'block';
-            document.getElementById('infoForm').reset();
-            if (personalChartInstance) {
-                personalChartInstance.destroy();
-                personalChartInstance = null;
-                console.log('📊 개인 차트 소멸');
-            }
-            console.log('🔄 테스트 재시작, studentData:', JSON.stringify(studentData));
-        }
-    </script>
+    let table='<table><thead><tr><th>학생</th>';
+    questions.forEach((q,index)=>{ table+=`<th>문제 ${index+1}</th>`; });
+    table+='</tr></thead><tbody>';
+
+    studentData.forEach(student=>{
+        table+=`<tr><td>${student.label}</td>`;
+        student.responses.forEach(r=>table+=`<td>${r==='yes'?'✅ 씁니다':'❌ 안씁니다'}</td>`);
+        table+='</tr>';
+    });
+    table+='</tbody></table>';
+    tableContainer.innerHTML=table;
+}
+
+function showGraph() {
+    document.getElementById('resultSection').style.display='none';
+    document.getElementById('infoForm').style.display='none';
+    document.getElementById('testSection').style.display='none';
+    document.getElementById('addQuestionSection').style.display='none';
+    document.getElementById('graphSection').style.display='block';
+
+    const noDataMessage=document.getElementById('noDataMessage');
+    const scoreChart=document.getElementById('scoreChart');
+
+    if(studentData.length===0){ noDataMessage.style.display='block'; scoreChart.style.display='none'; return; }
+    else{ noDataMessage.style.display='none'; scoreChart.style.display='block'; }
+
+    if(chartInstance){ chartInstance.destroy(); }
+
+    const ctx=scoreChart.getContext('2d');
+    chartInstance = new Chart(ctx,{
+        type:'bar',
+        data:{
+            labels: studentData.map(d=>d.label),
+            datasets:[{
+                label:'줄임말 비사용 점수 (1-100)',
+                data: studentData.map(d=>d.score),
+                backgroundColor: [
+                    'rgba(75,192,192,0.7)',
+                    'rgba(54,162,235,0.7)',
+                    'rgba(255,206,86,0.7)',
+                    'rgba(255,99,132,0.7)',
+                    'rgba(153,102,255,0.7)',
+                    'rgba(255,159,64,0.7)',
+                    'rgba(199,199,199,0.7)'
+                ],
+                borderColor:[
+                    'rgba(75,192,192,1)',
+                    'rgba(54,162,235,1)',
+                    'rgba(255,206,86,1)',
+                    'rgba(255,99,132,1)',
+                    'rgba(153,102,255,1)',
+                    'rgba(255,159,64,1)',
+                    'rgba(199,199,199,1)'
+                ],
+                borderWidth:2, borderRadius:6
+            }]
+        },
+        options:{ responsive:true, scales:{ y:{ beginAtZero:true, max:100 } } }
+    });
+}
+
+function restartTest() {
+    currentQuestion=0; score=0; currentStudent={}; currentResponses=[];
+    document.getElementById('testSection').style.display='none';
+    document.getElementById('resultSection').style.display='none';
+    document.getElementById('graphSection').style.display='none';
+    document.getElementById('addQuestionSection').style.display='none';
+    document.getElementById('infoForm').style.display='block';
+    document.getElementById('infoForm').reset();
+    if(personalChartInstance){ personalChartInstance.destroy(); personalChartInstance=null; }
+}
+</script>
 </body>
 </html>
