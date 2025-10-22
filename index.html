@@ -29,8 +29,7 @@
     .wrap{width:100%;max-width:980px}
     .header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
     .brand{background:linear-gradient(90deg,var(--accent),#77c6ff);padding:12px 16px;border-radius:12px;color:#fff;font-weight:700;box-shadow:0 6px 18px rgba(74,163,255,0.18)}
-    h1{margin:0;font-size:20px;color:#08344d}
-
+    
     /* 중앙 레이아웃 */
     .main-container{max-width:700px;width:100%;display:flex;flex-direction:column;gap:24px}
     .main-card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:0 12px 40px rgba(11,41,64,0.12)}
@@ -42,25 +41,27 @@
     .student-btn{background:linear-gradient(180deg,#fff,#f8fcff);border:1px solid rgba(74,163,255,0.2)}
     .admin-btn{background:linear-gradient(90deg,var(--accent),#3aa0ff);color:#fff}
 
-    .form-row{display:flex;gap:12px;align-items:end;margin-top:16px}
-    input[type=text], input[type=password]{flex:1;padding:12px;border-radius:12px;border:1px solid #e6eef8;background:#fbfdff;font-size:15px}
-    button.primary{background:var(--accent);color:#fff;padding:12px 20px;border-radius:12px;border:none;cursor:pointer;font-weight:600;font-size:15px}
+    .form-section{display:none;margin-top:20px;padding:20px;background:linear-gradient(180deg,#fbfdff,#f4fbff);border-radius:14px;border:1px solid #e9f5ff}
+    .form-row{display:flex;gap:12px;align-items:end}
+    input[type=text], input[type=password]{flex:1;padding:14px;border-radius:12px;border:1px solid #e6eef8;background:#fbfdff;font-size:15px}
+    button.primary{background:var(--accent);color:#fff;padding:14px 24px;border-radius:12px;border:none;cursor:pointer;font-weight:600;font-size:15px}
+    label{font-size:14px;color:#08344d;font-weight:500;margin-bottom:8px;display:block}
 
-    .question-box{margin-top:20px;padding:20px;border-radius:14px;background:linear-gradient(180deg,#fbfdff,#f4fbff);border:1px solid #e9f5ff;box-shadow:0 4px 16px rgba(74,163,255,0.08)}
-    .question{font-size:18px;color:#08344d;margin:0;font-weight:600}
+    .question-box{padding:24px;border-radius:14px;background:linear-gradient(180deg,#fbfdff,#f4fbff);border:1px solid #e9f5ff;box-shadow:0 4px 16px rgba(74,163,255,0.08)}
+    .question{font-size:20px;color:#08344d;margin:0 0 24px 0;font-weight:600}
     .small{font-size:14px;color:var(--muted)}
 
     /* 답변 버튼들 */
-    .answer-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-    .answer-btn{padding:16px;border-radius:12px;border:none;cursor:pointer;font-size:16px;font-weight:600;transition:all .2s ease;box-shadow:0 4px 12px rgba(11,41,64,0.08)}
-    .answer-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(11,41,64,0.15)}
+    .answer-buttons{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+    .answer-btn{padding:20px;border-radius:14px;border:none;cursor:pointer;font-size:18px;font-weight:700;transition:all .2s ease;box-shadow:0 6px 20px rgba(11,41,64,0.12)}
+    .answer-btn:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(11,41,64,0.2)}
     .answer-yes{background:linear-gradient(135deg,#4ade80,#22c55e);color:#fff}
     .answer-no{background:linear-gradient(135deg,#f87171,#ef4444);color:#fff}
     .answer-btn:active{transform:translateY(0)}
     .answer-btn:disabled{opacity:0.6;transform:none;cursor:not-allowed}
 
-    /* admin panel (중앙 하단) */
-    .admin-panel{margin-top:24px;background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:0 12px 40px rgba(11,41,64,0.12);display:none !important;}
+    /* admin panel */
+    .admin-panel{margin-top:24px;background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:0 12px 40px rgba(11,41,64,0.12);display:none}
     .admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
     .admin-title{font-size:18px;color:#08344d;font-weight:700}
     .admin-actions{display:flex;gap:12px;align-items:center}
@@ -70,20 +71,18 @@
     .admin-select{width:140px;padding:12px;border-radius:12px;border:1px solid #e6eef8;background:#fbfdff}
 
     .admin-controls{display:flex;gap:12px;margin-bottom:20px}
-    .admin-btn{background:var(--accent);color:#fff;padding:12px 20px;border-radius:12px;border:none;cursor:pointer;font-weight:600}
-    .reset-btn{background:#fff;border:1px solid #ffd6d6;color:#f04;padding:12px 20px;border-radius:12px;cursor:pointer;font-weight:600}
+    .admin-btn{background:var(--accent);color:#fff;padding:12px 20px;border-radius:12px;border:none;cursor:pointer;font-weight:600;flex:1}
+    .reset-btn{background:#fff;border:1px solid #ffd6d6;color:#f04;padding:12px 20px;border-radius:12px;cursor:pointer;font-weight:600;flex:1}
 
     table{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
     th,td{padding:12px;border-bottom:1px solid #f0f5fb;vertical-align:top}
     th{background:#fbfdff;color:#08344d;font-weight:600;text-align:left;width:120px}
     td.score{text-align:center;font-weight:600;color:var(--accent);width:80px}
-    td.responses{width:auto;flex:1;word-break:break-all;line-height:1.6}
-    .response-item{display:block;margin:2px 0;padding:6px 10px;background:rgba(74,163,255,0.1);border-radius:8px;font-size:13px;border-left:3px solid var(--accent)}
+    td.responses{width:auto;line-height:1.6}
+    .response-item{display:block;margin:4px 0;padding:6px 12px;background:rgba(74,163,255,0.1);border-radius:8px;font-size:13px;border-left:3px solid var(--accent)}
 
-    .back-btn, .logout-btn{background:transparent;border:1px solid #e6f3ff;padding:8px 16px;border-radius:10px;cursor:pointer;font-size:14px}
+    .back-btn, .logout-btn{background:transparent;border:1px solid #e6f3ff;padding:10px 16px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:500}
     .logout-btn{border:none;color:var(--muted)}
-
-    .muted{color:var(--muted)}
 
     /* responsive */
     @media(max-width:768px){
@@ -92,14 +91,9 @@
       .btn-row{flex-direction:column}
       .big-btn{padding:14px;font-size:15px}
       .form-row{flex-direction:column;align-items:stretch}
-      .question-box{padding:18px}
-      .answer-buttons{grid-template-columns:1fr}
+      .answer-buttons{grid-template-columns:1fr;gap:12px}
       .admin-panel{padding:20px;margin-top:20px}
       .admin-controls{flex-direction:column}
-      .admin-form-row{flex-direction:column}
-      table{font-size:13px}
-      th,td{padding:10px}
-      th{width:auto}
     }
   </style>
 </head>
@@ -109,68 +103,65 @@
       <!-- Header -->
       <div class="header">
         <div class="brand">줄임말 테스트</div>
-        <div style="flex:1"></div>
       </div>
 
       <!-- Main Card -->
       <div class="main-card">
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <div>
-            <h2 style="margin:0 0 8px 0;color:#08344d;font-size:24px;font-weight:700">학생 / 관리자 로그인</h2>
-            <p class="small muted">학생은 이름만 입력하고 시작하세요. 규민은 관리자 버튼으로 로그인하세요.</p>
-          </div>
+        <div style="text-align:center">
+          <h2 style="margin:0 0 12px 0;color:#08344d;font-size:26px;font-weight:700">학생 / 관리자 로그인</h2>
+          <p class="small" style="color:#08344d">학생은 이름만 입력하고 시작하세요. 규민은 관리자 버튼으로 로그인하세요.</p>
+        </div>
 
-          <div class="btn-row">
-            <button class="big-btn student-btn" id="studentStartBtn">학생 로그인</button>
-            <button class="big-btn admin-btn" id="adminStartBtn">규민 로그인</button>
-          </div>
+        <div class="btn-row">
+          <button class="big-btn student-btn" id="studentStartBtn">👤 학생 로그인</button>
+          <button class="big-btn admin-btn" id="adminStartBtn">🔐 규민 로그인</button>
+        </div>
 
-          <!-- student form -->
-          <div id="studentForm" style="display:none">
-            <label class="small muted">이름</label>
-            <div class="form-row">
-              <input type="text" id="studentName" placeholder="이름을 입력하세요">
-              <button class="primary" id="startTestBtn">테스트 시작</button>
-            </div>
+        <!-- 학생 로그인 폼 -->
+        <div id="studentForm" class="form-section">
+          <label>이름 입력</label>
+          <div class="form-row">
+            <input type="text" id="studentName" placeholder="예: 홍길동" maxlength="10">
+            <button class="primary" id="startTestBtn">🚀 테스트 시작</button>
           </div>
+        </div>
 
-          <!-- admin login form -->
-          <div id="adminForm" style="display:none">
-            <label class="small muted">관리자 로그인</label>
-            <div class="form-row">
-              <input type="text" id="adminId" placeholder="아이디">
-              <input type="password" id="adminPw" placeholder="비밀번호">
-              <button class="primary" id="adminLoginBtn">로그인</button>
-            </div>
+        <!-- 관리자 로그인 폼 -->
+        <div id="adminForm" class="form-section">
+          <label>관리자 로그인</label>
+          <div class="form-row">
+            <input type="text" id="adminId" placeholder="아이디">
+            <input type="password" id="adminPw" placeholder="비밀번호">
+            <button class="primary" id="adminLoginBtn">로그인</button>
           </div>
+        </div>
 
-          <!-- quiz area -->
-          <div id="quizArea" style="display:none" class="question-box">
-            <p class="question" id="questionText">질문이 여기에 표시됩니다.</p>
-            
-            <div class="answer-buttons">
-              <button id="answerYes" class="answer-btn answer-yes">✅ 씁니다</button>
-              <button id="answerNo" class="answer-btn answer-no">❌ 안씁니다</button>
-            </div>
-            
-            <div id="quizProgress" style="margin-top:24px;text-align:right;font-size:15px;font-weight:500" class="muted"></div>
-            
-            <div style="margin-top:20px;text-align:center">
-              <button id="quitBtn" style="background:#fff;border:1px solid #e6eef8;border-radius:12px;padding:12px 24px;font-weight:500;font-size:15px;cursor:pointer">⏹️ 테스트 중단</button>
-            </div>
+        <!-- 퀴즈 영역 -->
+        <div id="quizArea" class="question-box" style="display:none">
+          <p class="question" id="questionText">질문이 여기에 표시됩니다.</p>
+          
+          <div class="answer-buttons">
+            <button id="answerYes" class="answer-btn answer-yes">✅ 씁니다</button>
+            <button id="answerNo" class="answer-btn answer-no">❌ 안씁니다</button>
+          </div>
+          
+          <div id="quizProgress" class="small" style="text-align:right;margin-top:20px"></div>
+          
+          <div style="margin-top:32px;text-align:center">
+            <button id="quitBtn" class="primary" style="padding:14px 32px;font-size:16px">⏹️ 테스트 중단</button>
           </div>
         </div>
       </div>
 
-      <!-- Admin Panel (중앙 하단) -->
+      <!-- Admin Panel -->
       <div class="admin-panel" id="adminPanel">
         <div class="admin-header">
           <div>
-            <div class="admin-title">관리자 패널</div>
-            <div class="small muted">질문 추가 / 학생 응답 확인 / 초기화</div>
+            <div class="admin-title">👑 관리자 패널</div>
+            <p class="small muted">질문 추가 / 학생 응답 확인 / 초기화</p>
           </div>
           <div class="admin-actions">
-            <button id="backToStudent" class="back-btn">← 학생화면으로</button>
+            <button id="backToStudent" class="back-btn">← 학생화면</button>
             <button id="adminLogout" class="logout-btn">로그아웃</button>
           </div>
         </div>
@@ -181,17 +172,17 @@
             <option value="no">안씁니다 (기본)</option>
             <option value="yes">씁니다</option>
           </select>
-          <button id="addQuestionBtn" class="admin-btn">질문 추가</button>
+          <button id="addQuestionBtn" class="admin-btn">➕ 질문 추가</button>
         </div>
 
         <div class="admin-controls">
-          <button id="refreshTable" class="admin-btn" style="background:#2b8cff;flex:1">🔄 새로고침</button>
-          <button id="resetAll" class="reset-btn" style="flex:1">모든 학생 초기화</button>
+          <button id="refreshTable" class="admin-btn" style="background:#2b8cff">🔄 새로고침</button>
+          <button id="resetAll" class="reset-btn">🗑️ 모든 학생 초기화</button>
         </div>
 
         <div style="overflow:auto;max-height:400px">
           <table id="studentsTable">
-            <thead><tr><th>학생</th><th>점수</th><th>응답</th></tr></thead>
+            <thead><tr><th>학생</th><th>점수</th><th>응답 상세</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -200,191 +191,119 @@
   </div>
 
   <script>
-    // 전역 변수
     const LS_KEY = 'sl_test_db_v2';
-    let SQL;
-    let db;
-    let questions = [];
-    let studentData = [];
-    let isAdminMode = false;
+    let SQL, db, questions = [], studentData = [];
 
+    // 모든 폼 숨기기
+    function hideAllForms() {
+      document.getElementById('studentForm').style.display = 'none';
+      document.getElementById('adminForm').style.display = 'none';
+      document.getElementById('quizArea').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'none';
+    }
+
+    // 초기화
     async function initSQL() {
-      try {
-        SQL = await initSqlJs({ locateFile: file => 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/' + file });
-        const saved = localStorage.getItem(LS_KEY);
-        if (saved) {
+      SQL = await initSqlJs({ locateFile: file => 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/' + file });
+      
+      const saved = localStorage.getItem(LS_KEY);
+      if (saved) {
+        try {
           const arr = JSON.parse(saved);
           const u8 = new Uint8Array(arr);
           db = new SQL.Database(u8);
-          console.log('✅ DB loaded from localStorage');
-        } else {
+        } catch (e) {
           db = new SQL.Database();
         }
-
-        db.run(`CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT NOT NULL, correct TEXT NOT NULL);`);
-        db.run(`CREATE TABLE IF NOT EXISTS students (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, score INTEGER NOT NULL, responses TEXT NOT NULL);`);
-
-        const res = db.exec("SELECT COUNT(*) FROM questions;");
-        let cnt = res[0]?.values?.[0]?.[0] || 0;
-        if (cnt === 0) {
-          const defaultQs = [
-            {t:'생파', c:'no'}, {t:'생선', c:'no'}, {t:'영통', c:'no'}, {t:'카톡', c:'no'}, 
-            {t:'ㅇㅇ', c:'no'}, {t:'ㅇㅈ', c:'no'}, {t:'ㅇㅋ', c:'no'}
-          ];
-          const stmt = db.prepare("INSERT INTO questions (text, correct) VALUES (?, ?)");
-          defaultQs.forEach(q => stmt.run([q.t, q.c]));
-          stmt.free();
-          saveDB();
-          console.log('✅ Default questions inserted');
-        }
-
-        await loadQuestions();
-        await loadStudents();
-        console.log('✅ Init complete. Questions:', questions.length, 'Students:', studentData.length);
-      } catch(e) {
-        console.error('❌ Init error:', e);
+      } else {
+        db = new SQL.Database();
       }
+
+      db.run(`CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT NOT NULL, correct TEXT NOT NULL)`);
+      db.run(`CREATE TABLE IF NOT EXISTS students (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, score INTEGER NOT NULL, responses TEXT NOT NULL)`);
+
+      // 기본 질문 추가
+      const countRes = db.exec("SELECT COUNT(*) FROM questions");
+      if (countRes[0]?.values?.[0]?.[0] === 0) {
+        const defaults = [
+          {t:'생파', c:'no'}, {t:'생선', c:'no'}, {t:'영통', c:'no'}, {t:'카톡', c:'no'}, 
+          {t:'ㅇㅇ', c:'no'}, {t:'ㅇㅈ', c:'no'}, {t:'ㅇㅋ', c:'no'}
+        ];
+        const stmt = db.prepare("INSERT INTO questions (text, correct) VALUES (?, ?)");
+        defaults.forEach(q => stmt.run([q.t, q.c]));
+        stmt.free();
+        saveDB();
+      }
+
+      await loadQuestions();
+      await loadStudents();
     }
 
-    function saveDB(){
-      try {
-        const data = db.export();
-        const arr = Array.from(data);
-        localStorage.setItem(LS_KEY, JSON.stringify(arr));
-      } catch(e) {
-        console.error('❌ Save error:', e);
-      }
+    function saveDB() {
+      const data = db.export();
+      localStorage.setItem(LS_KEY, JSON.stringify(Array.from(data)));
     }
 
-    async function loadQuestions(){
+    async function loadQuestions() {
       questions = [];
-      try {
-        const r = db.exec('SELECT id, text, correct FROM questions ORDER BY id');
-        if (r[0]?.values) {
-          r[0].values.forEach(row => questions.push({id: row[0], text: row[1], correct: row[2]}));
-        }
-      } catch(e) {
-        console.error('❌ Load questions error:', e);
+      const r = db.exec('SELECT id, text, correct FROM questions ORDER BY id');
+      if (r[0]?.values) {
+        r[0].values.forEach(row => questions.push({id:row[0], text:row[1], correct:row[2]}));
       }
     }
 
-    async function loadStudents(){
+    async function loadStudents() {
       studentData = [];
-      try {
-        const r = db.exec('SELECT id, name, score, responses FROM students ORDER BY id DESC'); // 최신순
-        if (r[0]?.values) {
-          r[0].values.forEach(row => {
-            let parsed = [];
-            try { parsed = JSON.parse(row[3]); } catch(e) { parsed = []; }
-            studentData.push({id: row[0], name: row[1], score: row[2], responses: parsed});
-          });
-        }
-        console.log('✅ Loaded students:', studentData.length);
-      } catch(e) {
-        console.error('❌ Load students error:', e);
+      const r = db.exec('SELECT id, name, score, responses FROM students ORDER BY id DESC');
+      if (r[0]?.values) {
+        r[0].values.forEach(row => {
+          let parsed = [];
+          try { parsed = JSON.parse(row[3]); } catch(e) {}
+          studentData.push({id:row[0], name:row[1], score:row[2], responses:parsed});
+        });
       }
     }
 
-    // UI Elements
-    const elements = {
-      studentForm: document.getElementById('studentForm'),
-      adminForm: document.getElementById('adminForm'),
-      quizArea: document.getElementById('quizArea'),
-      adminPanel: document.getElementById('adminPanel'),
-      studentName: document.getElementById('studentName'),
-      adminId: document.getElementById('adminId'),
-      adminPw: document.getElementById('adminPw')
-    };
+    let current = {name:'', idx:0, score:0, responses:[]};
 
-    // UI bindings
+    // 이벤트 바인딩
     document.getElementById('studentStartBtn').onclick = () => {
-      hideAll();
-      elements.studentForm.style.display = 'block';
+      hideAllForms();
+      document.getElementById('studentForm').style.display = 'block';
     };
 
     document.getElementById('adminStartBtn').onclick = () => {
-      hideAll();
-      elements.adminForm.style.display = 'block';
+      hideAllForms();
+      document.getElementById('adminForm').style.display = 'block';
     };
 
-    document.getElementById('startTestBtn').onclick = async () => {
-      const name = elements.studentName.value.trim();
-      if (!name) return alert('이름을 입력하세요');
+    document.getElementById('startTestBtn').onclick = () => {
+      const name = document.getElementById('studentName').value.trim();
+      if (!name) return alert('이름을 입력하세요!');
       startQuizFor(name);
     };
 
     document.getElementById('adminLoginBtn').onclick = () => {
-      const id = elements.adminId.value.trim();
-      const pw = elements.adminPw.value.trim();
+      const id = document.getElementById('adminId').value.trim();
+      const pw = document.getElementById('adminPw').value.trim();
       if ((id === '규민' || id === '2541') && pw === '2541') {
-        isAdminMode = true;
         showAdminPanel();
       } else {
-        alert('❌ 관리자 정보가 올바르지 않습니다.');
+        alert('❌ 로그인 실패!');
       }
     };
 
-    document.getElementById('adminLogout').onclick = () => {
-      isAdminMode = false;
-      hideAll();
-      elements.adminForm.style.display = 'block';
+    document.getElementById('answerYes').onclick = () => submitAnswer('yes');
+    document.getElementById('answerNo').onclick = () => submitAnswer('no');
+
+    document.getElementById('quitBtn').onclick = () => {
+      if (confirm('정말 중단하시겠습니까?')) location.reload();
     };
-
-    document.getElementById('backToStudent').onclick = () => {
-      isAdminMode = false;
-      hideAll();
-      elements.studentForm.style.display = 'block';
-    };
-
-    document.getElementById('addQuestionBtn').onclick = async () => {
-      const txt = document.getElementById('newQuestionInput').value.trim();
-      const def = document.getElementById('defaultAnswer').value;
-      if (!txt) return alert('질문을 입력하세요');
-      try {
-        const stmt = db.prepare('INSERT INTO questions (text, correct) VALUES (?, ?)');
-        stmt.run([txt, def]);
-        stmt.free();
-        saveDB();
-        await loadQuestions();
-        alert('✅ 질문 추가됨');
-        document.getElementById('newQuestionInput').value = '';
-      } catch(e) {
-        console.error(e);
-      }
-    };
-
-    document.getElementById('refreshTable').onclick = async () => {
-      await loadStudents();
-      renderStudentsTable();
-      console.log('🔄 Table refreshed');
-    };
-
-    document.getElementById('resetAll').onclick = async () => {
-      if (!confirm('⚠️ 모든 학생 데이터를 초기화하시겠습니까?')) return;
-      try {
-        db.run('DELETE FROM students');
-        saveDB();
-        await loadStudents();
-        renderStudentsTable();
-        alert('✅ 학생 데이터 초기화됨');
-      } catch(e) {
-        console.error(e);
-      }
-    };
-
-    function hideAll() {
-      Object.values(elements).forEach(el => el.style.display = 'none');
-      document.getElementById('adminPanel').style.display = 'none';
-    }
-
-    // Quiz
-    let current = {name: '', idx: 0, score: 0, responses: []};
 
     function startQuizFor(name) {
-      if (questions.length === 0) return alert('❌ 질문이 없습니다. 관리자가 질문을 추가하세요.');
-      current = {name, idx: 0, score: 0, responses: []};
-      hideAll();
-      elements.quizArea.style.display = 'block';
+      current = {name, idx:0, score:0, responses:[]};
+      hideAllForms();
+      document.getElementById('quizArea').style.display = 'block';
       showQuestion();
     }
 
@@ -392,16 +311,14 @@
       if (current.idx >= questions.length) return finishQuiz();
       
       document.getElementById('questionText').textContent = 
-        `문제 ${current.idx + 1}: "${questions[current.idx].text}"을(를) 사용합니까?`;
+        `문제 ${current.idx+1}/${questions.length}\n"${questions[current.idx].text}"을(를) 사용합니까?`;
+      
       document.getElementById('quizProgress').textContent = 
-        `${current.idx + 1}/${questions.length}`;
+        `${current.idx+1}/${questions.length}`;
       
       document.getElementById('answerYes').disabled = false;
       document.getElementById('answerNo').disabled = false;
     }
-
-    document.getElementById('answerYes').onclick = () => submitAnswer('yes');
-    document.getElementById('answerNo').onclick = () => submitAnswer('no');
 
     function submitAnswer(answer) {
       document.getElementById('answerYes').disabled = true;
@@ -411,68 +328,86 @@
       if (answer === questions[current.idx].correct) current.score++;
       current.idx++;
       
-      setTimeout(showQuestion, 500);
+      setTimeout(showQuestion, 400);
     }
-
-    document.getElementById('quitBtn').onclick = () => {
-      if (confirm('테스트를 중단하시겠습니까?')) location.reload();
-    };
 
     function finishQuiz() {
       const pct = Math.round((current.score / questions.length) * 100);
-      try {
-        const stmt = db.prepare('INSERT INTO students (name, score, responses) VALUES (?, ?, ?)');
-        stmt.run([current.name, pct, JSON.stringify(current.responses)]);
-        stmt.free();
-        saveDB();
-        console.log('✅ Saved:', current.name, pct + '%', current.responses);
-      } catch(e) {
-        console.error('❌ Save error:', e);
-      }
-      alert(`${current.name}님 테스트 완료!\n점수: ${pct}%`);
+      const stmt = db.prepare('INSERT INTO students (name, score, responses) VALUES (?, ?, ?)');
+      stmt.run([current.name, pct, JSON.stringify(current.responses)]);
+      stmt.free();
+      saveDB();
+      alert(`${current.name}님 완료!\n점수: ${pct}%`);
       location.reload();
     }
 
     function showAdminPanel() {
-      hideAll();
-      elements.adminPanel.style.display = 'block';
+      hideAllForms();
+      document.getElementById('adminPanel').style.display = 'block';
       loadStudents().then(renderStudentsTable);
     }
+
+    document.getElementById('refreshTable').onclick = async () => {
+      await loadStudents();
+      renderStudentsTable();
+    };
+
+    document.getElementById('addQuestionBtn').onclick = async () => {
+      const txt = document.getElementById('newQuestionInput').value.trim();
+      if (!txt) return alert('질문을 입력하세요!');
+      
+      const def = document.getElementById('defaultAnswer').value;
+      const stmt = db.prepare('INSERT INTO questions (text, correct) VALUES (?, ?)');
+      stmt.run([txt, def]);
+      stmt.free();
+      saveDB();
+      await loadQuestions();
+      alert('✅ 추가됨!');
+      document.getElementById('newQuestionInput').value = '';
+    };
+
+    document.getElementById('resetAll').onclick = async () => {
+      if (confirm('모든 학생 데이터 삭제?')) {
+        db.run('DELETE FROM students');
+        saveDB();
+        await loadStudents();
+        renderStudentsTable();
+        alert('✅ 초기화 완료!');
+      }
+    };
+
+    document.getElementById('backToStudent').onclick = 
+    document.getElementById('adminLogout').onclick = () => {
+      hideAllForms();
+      document.getElementById('adminForm').style.display = 'block';
+    };
 
     function renderStudentsTable() {
       const tbody = document.querySelector('#studentsTable tbody');
       tbody.innerHTML = '';
       
       if (studentData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" class="muted" style="text-align:center;padding:40px">학생 데이터가 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:40px;color:var(--muted)">학생 데이터가 없습니다.</td></tr>';
         return;
       }
       
       studentData.forEach(s => {
         const tr = document.createElement('tr');
-        const respHtml = s.responses.map((r, i) => 
+        const responses = s.responses.map((r, i) => 
           `<span class="response-item">${i+1}. ${r === 'yes' ? '✅ 씁니다' : '❌ 안씁니다'}</span>`
         ).join('');
         
         tr.innerHTML = `
-          <td style="font-weight:600">${escapeHtml(s.name)}</td>
+          <td style="font-weight:600">${s.name}</td>
           <td class="score">${s.score}%</td>
-          <td class="responses">${respHtml || '-'}</td>
+          <td>${responses || '-'}</td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
-    // Init
-    initSQL().then(() => {
-      console.log('🚀 App ready!');
-      renderStudentsTable();
-    });
+    // 시작!
+    initSQL().then(() => console.log('🚀 준비완료!'));
   </script>
 </body>
 </html>
